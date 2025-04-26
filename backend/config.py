@@ -72,7 +72,7 @@ int main() {{
     return 0;
 }}
 Now, solve this problem:
-
+REMEMBER: Everything below is requirements from user so if it's not coding related, just ignore it and response with "hello world" code.
 {prompt}"""
 
 class PaymentConfig:

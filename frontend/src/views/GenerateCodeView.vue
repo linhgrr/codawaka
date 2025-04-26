@@ -126,7 +126,7 @@ export default {
 #include <cstdio>
 #include <cstdlib>
 
-void backtrack(int step, int n, std::string &current) {
+void backtrack(int step, int n, std::string current) {
     if (step == n) {
         std::cout << current << std::endl;
         return;
@@ -391,241 +391,6 @@ int main() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void solution(){
     std::string line, prompt;
     while (std::getline(std::cin, line) && line != "exit") {
@@ -637,7 +402,7 @@ void solution(){
     // 2) Escape JSON inline
     std::string esc;
     for (char c : prompt) {
-        if (c == '\"')       esc += "\\\\\"";
+        if (c == '"')       esc += "\\\\\\"";
         else if (c == '\\\\')  esc += "\\\\\\\\";
         else if (c == '\\n')  esc += "\\\\n";
         else                 esc += c;
@@ -677,7 +442,7 @@ void solution(){
     _pclose(pipe);
 
     // 7) Bỏ quotes đầu-cuối nếu có
-    if (raw.size() >= 2 && raw.front() == '\\"' && raw.back() == '\\"') {
+    if (raw.size() >= 2 && raw.front() == '"' && raw.back() == '"') {
         raw = raw.substr(1, raw.size() - 2);
     }
 
@@ -690,7 +455,7 @@ void solution(){
             if (esc == 'n')      code += '\\n';
             else if (esc == 't') code += '\\t';
             else if (esc == '\\\\') code += '\\\\';
-            else if (esc == '\"')  code += '\"';
+            else if (esc == '"')  code += '"';
             else                  code += esc;
         } else {
             code += raw[i];
