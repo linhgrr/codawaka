@@ -11,6 +11,9 @@
             <div class="card-body p-4 p-md-5">
               <h2 class="register-title text-center mb-4">Register Account</h2>
               
+              <div v-if="error" class="alert alert-danger mb-4">{{ error }}</div>
+              <div v-if="success" class="alert alert-success mb-4">{{ success }}</div>
+              
               <form @submit.prevent="onSubmit">
                 <div class="form-group mb-4">
                   <label for="username" class="form-label">Username</label>
@@ -48,6 +51,37 @@
                   >
                 </div>
                 
+                <div class="form-group mb-4">
+                  <label for="referralCode" class="form-label">
+                    Referral Code <span class="text-muted">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control custom-input"
+                    id="referralCode"
+                    v-model="referralCode"
+                    placeholder="Enter referral code if you have one"
+                  >
+                  <small class="form-text text-muted">
+                    Have a friend's code? Enter it here and get started with more credits!
+                  </small>
+                </div>
+                
+                <div class="referral-info alert alert-info mb-4">
+                  <div class="d-flex align-items-start">
+                    <i class="fas fa-info-circle me-2 mt-1"></i>
+                    <div>
+                      <p class="mb-1"><strong>Referral Benefits:</strong></p>
+                      <ul class="mb-0 ps-3">
+                        <li>New users start with <strong>2 credits</strong></li>
+                        <li>Use a referral code to support your friend</li>
+                        <li>When someone uses your code, you get <strong>+3 credits</strong></li>
+                        <li>After registration, share your own code to earn more!</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
                 <button type="submit" class="btn btn-primary btn-glow w-100 py-3 register-btn" :disabled="loading">
                   <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                   {{ loading ? 'Registering...' : 'Register' }}
@@ -76,9 +110,18 @@ export default {
       username: '',
       email: '',
       password: '',
+      referralCode: '',
       error: null,
       success: null,
       loading: false
+    }
+  },
+  created() {
+    // Check if there's a referral code in the URL query params
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeFromUrl = urlParams.get('ref');
+    if (codeFromUrl) {
+      this.referralCode = codeFromUrl;
     }
   },
   methods: {
@@ -93,6 +136,11 @@ export default {
         password: this.password
       }
       
+      // Add referral code if provided
+      if (this.referralCode && this.referralCode.trim() !== '') {
+        user.referral_code = this.referralCode.trim();
+      }
+      
       this.$store.dispatch('register', user)
         .then(() => {
           this.success = 'Registration successful! You can login now.'
@@ -100,6 +148,7 @@ export default {
           this.username = ''
           this.email = ''
           this.password = ''
+          this.referralCode = ''
         })
         .catch(err => {
           console.error(err)

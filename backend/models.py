@@ -12,8 +12,12 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
-    is_admin = Column(Boolean, default=False)  # Thêm trường is_admin
-    credits = Column(Float, default=10)  # Default credits for new users
+    is_admin = Column(Boolean, default=False)
+    credits = Column(Float, default=2)  # Default credits changed from 10 to 2
+    # Các cột mới thêm nullable=True để tương thích với db hiện tại
+    referral_code = Column(String, unique=True, index=True)
+    referred_by = Column(String, nullable=True)
+    registration_ip = Column(String)
     
     # Relationship to CodeGeneration
     code_generations = relationship("CodeGeneration", back_populates="user")
