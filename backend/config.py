@@ -43,9 +43,6 @@ class AIModelsConfig:
     if not GOOGLE_API_KEYS and GOOGLE_API_KEY:
         GOOGLE_API_KEYS = [GOOGLE_API_KEY]
     
-    # Google API request limits
-    GOOGLE_API_REQUESTS_PER_KEY = int(os.getenv("GOOGLE_API_REQUESTS_PER_KEY", "10"))
-    
     # Model lists
     OPENAI_MODELS = ["gpt-3.5-turbo", "gpt-4o", "gpt-4-turbo", "claude-3-opus", "claude-3-sonnet"]
     GOOGLE_MODELS = ["gemini-pro", "gemini-1.5-pro", "gemini-2.0-flash"]

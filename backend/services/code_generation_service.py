@@ -19,8 +19,7 @@ logger = logging.getLogger("code_generation_service")
 # Initialize and register key manager in DI container
 google_key_manager = GoogleAPIKeyManager()
 google_key_manager.initialize(
-    api_keys=Config.AI.GOOGLE_API_KEYS,
-    max_requests_per_key=Config.AI.GOOGLE_API_REQUESTS_PER_KEY
+    api_keys=Config.AI.GOOGLE_API_KEYS
 )
 DIContainer.register_instance(GoogleAPIKeyManager, google_key_manager)
 
