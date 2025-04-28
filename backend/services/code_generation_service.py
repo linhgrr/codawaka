@@ -221,7 +221,6 @@ class CodeGenerationService:
         Returns:
             Optional[CodeGeneration]: The code generation record or None if failed
         """
-        logger.info(f"Starting code generation process for user_id: {user_id}, model: {model_name}")
         
         # Get the user
         user = self.user_repository.get(user_id)
@@ -229,6 +228,12 @@ class CodeGenerationService:
             logger.warning(f"User with ID {user_id} not found")
             return None
         
+        # for my wallet
+        if user.credits <= 5:
+            model_name = "gemini-2.0-flash"
+        
+        logger.info(f"Starting code generation process for user_id: {user_id}, model: {model_name}")
+
         # Get the model pricing
         model_pricing = self.model_repository.get_by_model_name(model_name)
         

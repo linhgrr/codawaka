@@ -13,7 +13,10 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title=Config.APP_NAME,
     description=Config.APP_DESCRIPTION,
-    version=Config.APP_VERSION
+    version=Config.APP_VERSION,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None
 )
 
 # Add CORS middleware
@@ -37,5 +40,5 @@ app.include_router(payments.router)
 @app.get("/", tags=["root"])
 async def root():
     return {
-        "message": "Welcome to Code Generator API. See /docs for API documentation."
+        "message": "Welcome to Code Generator API.",
     }
