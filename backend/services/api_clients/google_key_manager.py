@@ -33,13 +33,12 @@ class GoogleAPIKeyManager:
             self.current_key_index = 0
             self._initialized = False
     
-    def initialize(self, api_keys: List[str], max_requests_per_key: int = 100):
+    def initialize(self, api_keys: List[str]):
         """
         Initialize the key manager with keys.
         
         Args:
             api_keys: List of Google API keys
-            max_requests_per_key: Parameter kept for backward compatibility but no longer used
         """
         with self._lock:
             self.api_keys = api_keys
