@@ -6,7 +6,7 @@ module.exports = {
   chainWebpack: config => {
     config.plugin('define').tap(args => {
       Object.assign(args[0]['process.env'], {
-        VUE_APP_API_URL: JSON.stringify(process.env.VUE_APP_API_URL || 'http://47.129.30.28:8000')
+        VUE_APP_API_URL: JSON.stringify(process.env.VUE_APP_API_URL || 'https://codawaka-api.duckdns.org')
       })
       return args
     })
