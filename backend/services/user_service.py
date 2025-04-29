@@ -209,7 +209,7 @@ class UserService:
     def send_reset_email(email: str, reset_link: str):
         print("sending")
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = "🔒 Đặt lại mật khẩu Codawaka"
+        msg['Subject'] = "🔒 Đặt lại mật khẩu CodaWaka"
         msg['From'] = Config.EMAIL.FROM_ADDRESS
         msg['To'] = email
 
@@ -224,7 +224,7 @@ class UserService:
 
         Nếu bạn không yêu cầu, vui lòng bỏ qua email này.
 
-        © 2025 Codawaka. All rights reserved.
+        © 2025 Codaaka. All rights reserved.
         """
 
         # HTML content
@@ -236,7 +236,7 @@ class UserService:
         <!-- Header -->
         <tr>
             <td style="background-color: #004fff; padding: 20px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Codawaka</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">CodaWaka</h1>
             </td>
         </tr>
 
