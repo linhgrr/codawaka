@@ -207,27 +207,27 @@ class UserService:
 
     @staticmethod
     def send_reset_email(email: str, reset_link: str):
-        # Tạo email hỗn hợp (HTML + plain-text để phòng trường hợp client không đọc được HTML)
+        print("sending")
         msg = MIMEMultipart('alternative')
         msg['Subject'] = "🔒 Đặt lại mật khẩu Codawaka"
         msg['From'] = Config.EMAIL.FROM_ADDRESS
         msg['To'] = email
 
-        # Plain-text fallback (nếu client không hiển thị HTML)
+        # Plain text fallback
         text = f"""
-    Xin chào,
+        Xin chào,
 
-    Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.
+        Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.
 
-    Truy cập đường dẫn sau để đặt lại mật khẩu:
-    {reset_link}
+        Truy cập đường dẫn sau để đặt lại mật khẩu:
+        {reset_link}
 
-    Nếu bạn không yêu cầu, vui lòng bỏ qua email này.
+        Nếu bạn không yêu cầu, vui lòng bỏ qua email này.
 
-    © 2025 Codawaka. All rights reserved.
-    """
+        © 2025 Codawaka. All rights reserved.
+        """
 
-        # HTML chính
+        # HTML content
         html = f"""
     <html>
     <body style="font-family: sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
@@ -245,7 +245,7 @@ class UserService:
             <td style="padding: 40px;">
             <p style="font-size: 16px; color: #333; margin-top: 0;">Xin chào,</p>
             <p style="font-size: 16px; color: #333;">
-                Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. 
+                Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.
                 Nhấn nút bên dưới để tiếp tục:
             </p>
 
@@ -269,7 +269,7 @@ class UserService:
             </p>
 
             <p style="font-size: 16px; color: #333;">
-                Nếu bạn không yêu cầu, vui lòng bỏ qua email này. 
+                Nếu bạn không yêu cầu, vui lòng bỏ qua email này.
                 Mọi thắc mắc vui lòng liên hệ support@codawaka.com.
             </p>
             </td>
@@ -288,16 +288,18 @@ class UserService:
     </html>
     """
 
-        # Đính kèm cả plain-text và HTML
         msg.attach(MIMEText(text, 'plain'))
         msg.attach(MIMEText(html, 'html'))
 
-        # Gửi email
         try:
             with smtplib.SMTP(Config.EMAIL.SMTP_SERVER, Config.EMAIL.SMTP_PORT) as server:
+                server.ehlo()
                 server.starttls()
+                server.ehlo()
                 server.login(Config.EMAIL.SMTP_USER, Config.EMAIL.SMTP_PASSWORD)
                 server.sendmail(Config.EMAIL.FROM_ADDRESS, [email], msg.as_string())
-            print(f"✅ Đã gửi email đặt lại mật khẩu đến {email}")
+                print(f"✅ Đã gửi email đặt lại mật khẩu đến {email}")
+        except smtplib.SMTPAuthenticationError as e:
+            print(f"❌ Lỗi xác thực SMTP: {e.smtp_error.decode()}")
         except Exception as e:
             print(f"❌ Lỗi gửi email: {e}")
