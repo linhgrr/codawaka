@@ -14,3 +14,5 @@ export default {
   baseURL: API_URL,
   getFullURL: (path) => `${API_URL}${path}`
 };
+
+export { API_URL };
