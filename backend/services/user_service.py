@@ -4,7 +4,7 @@ from fastapi import HTTPException, status, Request, BackgroundTasks
 import random
 import string
 import ipaddress
-import jwt
+from jose import jwt
 from datetime import datetime, timedelta
 import smtplib
 from email.mime.text import MIMEText
