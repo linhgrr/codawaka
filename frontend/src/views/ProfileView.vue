@@ -118,10 +118,10 @@
                     <a :href="'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(referralLink)" target="_blank" class="btn btn-outline-primary">
                       <i class="fab fa-facebook"></i>
                     </a>
-                    <a :href="'https://twitter.com/intent/tweet?text=' + encodeURIComponent('Join me on Codawaka AI and get free credits! Use my referral code:') + '&url=' + encodeURIComponent(referralLink)" target="_blank" class="btn btn-outline-primary">
+                    <a :href="'https://twitter.com/intent/tweet?text=' + encodeURIComponent('Join me on CodaWaka AI and get free credits! Use my referral code:') + '&url=' + encodeURIComponent(referralLink)" target="_blank" class="btn btn-outline-primary">
                       <i class="fab fa-twitter"></i>
                     </a>
-                    <a :href="'mailto:?subject=' + encodeURIComponent('Join me on Codawaka AI') + '&body=' + encodeURIComponent('Hey!\n\nI\'m using Codawaka AI for code generation and thought you might like it too.\n\nSign up using my referral code: ' + user.referral_code + ' or use this link: ' + referralLink + '\n\nThanks!')" class="btn btn-outline-primary">
+                    <a :href="'mailto:?subject=' + encodeURIComponent('Join me on CodaWaka AI') + '&body=' + encodeURIComponent('Hey!\n\nI\'m using CodaWaka AI for code generation and thought you might like it too.\n\nSign up using my referral code: ' + user.referral_code + ' or use this link: ' + referralLink + '\n\nThanks!')" class="btn btn-outline-primary">
                       <i class="fas fa-envelope"></i>
                     </a>
                   </div>

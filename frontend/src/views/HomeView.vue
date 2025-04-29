@@ -27,7 +27,7 @@
         <div class="row justify-content-center">
           <div class="col-lg-11">
             <div id="video-section" class="editor-preview animate-in fade-up delay-4">
-              <div class="date-badge">May 2, 2025: Introducing Codawaka</div>
+              <div class="date-badge">May 2, 2025: Introducing CodaWaka</div>
               <div class="video-container">
                 <iframe 
                   id="intro-video"
@@ -35,7 +35,7 @@
                   width="100%" 
                   height="600" 
                   src="https://www.youtube.com/embed/tyITq3LCWXo" 
-                  title="Codawaka Introduction" 
+                  title="CodaWaka Introduction" 
                   frameborder="0" 
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                   allowfullscreen>
