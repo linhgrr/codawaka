@@ -1,78 +1,46 @@
 <template>
   <div class="home">
-    <!-- Hero section with polygon visual effect -->
+    <!-- Hero section with dark background -->
     <div class="hero-section">
-      <div class="polygon-particles"></div>
-      <div class="hero-glow-1"></div>
-      <div class="hero-glow-2"></div>
-      
+      <div class="hero-background"></div>
+      <div class="hero-overlay"></div>
       <div class="container">
-        <div class="row py-5">
-          <div class="col-lg-6 hero-content">
-            <div class="hero-badge">AI Agent</div>
-            <h1 class="hero-title">Code Generator AI</h1>
-            <p class="hero-tagline">"Thuật toán ứng dụng, đụng tool là xong"</p>
-            <p class="hero-description">
-              Intelligent coding platform leveraging the power of AI Agents to solve complex programming problems in just seconds.
-            </p>
-            <div class="hero-buttons mt-4">
+        <div class="row justify-content-center text-center py-5">
+          <div class="col-lg-10">
+            <h1 class="hero-title animate-in fade-up delay-1">Just code it<br>with CodaWaka</h1>
+            <p class="hero-tagline animate-in fade-up delay-2">The best tool to have in test</p>
+            
+            <div class="hero-buttons mt-4 animate-in fade-up delay-3">
               <div v-if="!isLoggedIn">
-                <router-link to="/login" class="btn btn-primary btn-glow me-3">Login</router-link>
-                <router-link to="/register" class="btn btn-outline-glow">Sign Up</router-link>
+                <router-link to="/register" class="btn btn-primary btn-cta me-3">Start for free</router-link>
+                <button @click="scrollToVideo" class="btn btn-dark btn-video">Watch video</button>
               </div>
               <div v-else>
-                <router-link to="/generate" class="btn btn-primary btn-glow me-3">Generate Code</router-link>
-                <router-link to="/history" class="btn btn-outline-glow">History</router-link>
+                <router-link to="/generate" class="btn btn-primary btn-cta me-3">Generate Code</router-link>
+                <router-link to="/history" class="btn btn-dark btn-video">My History</router-link>
               </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="video-container mt-4 mt-lg-0">
-              <div class="glow-border"></div>
-              <iframe 
-                width="100%" 
-                height="315" 
-                src="https://www.youtube.com/embed/tyITq3LCWXo" 
-                title="Code Generator Tutorial" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen>
-              </iframe>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Stats Counter -->
-    <div class="stats-section">
-      <div class="container">
-        <div class="row stats-row">
-          <div class="col-md-4 mb-4 mb-md-0">
-            <div class="stat-card">
-              <div class="stat-icon">
-                <i class="fas fa-code"></i>
+        
+        <!-- Editor interface preview image -->
+        <div class="row justify-content-center">
+          <div class="col-lg-11">
+            <div id="video-section" class="editor-preview animate-in fade-up delay-4">
+              <div class="date-badge">May 2, 2025: Introducing Codawaka</div>
+              <div class="video-container">
+                <iframe 
+                  id="intro-video"
+                  ref="youtubeVideo"
+                  width="100%" 
+                  height="600" 
+                  src="https://www.youtube.com/embed/tyITq3LCWXo" 
+                  title="Codawaka Introduction" 
+                  frameborder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowfullscreen>
+                </iframe>
               </div>
-              <div class="stat-number">50+</div>
-              <div class="stat-title">Programming Languages</div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-4 mb-md-0">
-            <div class="stat-card">
-              <div class="stat-icon">
-                <i class="fas fa-bolt"></i>
-              </div>
-              <div class="stat-number">0.5s</div>
-              <div class="stat-title">Response Time</div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="stat-card">
-              <div class="stat-icon">
-                <i class="fas fa-users"></i>
-              </div>
-              <div class="stat-number">10k+</div>
-              <div class="stat-title">Users</div>
             </div>
           </div>
         </div>
@@ -82,14 +50,14 @@
     <!-- Features section -->
     <div class="features-section py-5">
       <div class="container">
-        <div class="section-header text-center">
+        <div class="section-header text-center animate-in fade-up">
           <h6 class="section-subtitle">Features</h6>
           <h2 class="section-title">Key Features</h2>
           <div class="section-divider"></div>
         </div>
         
         <div class="row g-4 mt-3">
-          <div class="col-md-4">
+          <div class="col-md-4 animate-in fade-up delay-1">
             <div class="feature-card">
               <div class="feature-icon">
                 <i class="fas fa-rocket"></i>
@@ -98,7 +66,7 @@
               <p>Simply describe your requirements and the AI will generate high-quality code in seconds.</p>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 animate-in fade-up delay-2">
             <div class="feature-card">
               <div class="feature-icon">
                 <i class="fas fa-code-branch"></i>
@@ -107,7 +75,7 @@
               <p>Supports a wide range of popular programming languages including Python, JavaScript, Java, C++, and more.</p>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 animate-in fade-up delay-3">
             <div class="feature-card">
               <div class="feature-icon">
                 <i class="fas fa-shield-alt"></i>
@@ -123,28 +91,28 @@
     <!-- How it works section -->
     <div class="how-it-works-section py-5">
       <div class="container">
-        <div class="section-header text-center">
+        <div class="section-header text-center animate-in fade-up">
           <h6 class="section-subtitle">Process</h6>
           <h2 class="section-title">How It Works</h2>
           <div class="section-divider"></div>
         </div>
         
         <div class="row g-4 mt-4">
-          <div class="col-md-4">
+          <div class="col-md-4 animate-in fade-up delay-1">
             <div class="step-card">
               <div class="step-number">01</div>
               <h3>Describe Requirements</h3>
               <p>Enter a detailed description of the code or algorithm you need to create.</p>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 animate-in fade-up delay-2">
             <div class="step-card">
               <div class="step-number">02</div>
               <h3>AI Processing</h3>
               <p>Our advanced AI system analyzes your requirements and generates optimized code.</p>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 animate-in fade-up delay-3">
             <div class="step-card">
               <div class="step-number">03</div>
               <h3>Get Results</h3>
@@ -160,12 +128,12 @@
       <div class="cta-glow"></div>
       <div class="container">
         <div class="row align-items-center">
-          <div class="col-lg-8">
+          <div class="col-lg-8 animate-in fade-up delay-1">
             <h2 class="cta-title">Ready to experience the power of AI?</h2>
             <p class="cta-text">Create a free account and get 10 credits to start.</p>
           </div>
-          <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-            <router-link to="/register" class="btn btn-lg btn-primary btn-glow">Sign Up Now</router-link>
+          <div class="col-lg-4 text-lg-end mt-4 mt-lg-0 animate-in fade-up delay-2">
+            <router-link to="/register" class="btn btn-lg btn-primary btn-cta">Sign Up Now</router-link>
           </div>
         </div>
       </div>
@@ -181,6 +149,31 @@ export default {
   computed: {
     ...mapGetters(['isLoggedIn']),
   },
+  methods: {
+    scrollToVideo() {
+      // Get the video element
+      const videoSection = document.getElementById('video-section');
+      if (videoSection) {
+        // Scroll to video with smooth behavior
+        videoSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // Add a slight delay before playing the video to allow scrolling to complete
+        setTimeout(() => {
+          // Get the iframe element
+          const iframe = this.$refs.youtubeVideo;
+          
+          // Update the src to autoplay the video
+          if (iframe) {
+            let currentSrc = iframe.src;
+            if (currentSrc.indexOf('autoplay=1') === -1) {
+              // If autoplay parameter doesn't exist, add it
+              iframe.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'autoplay=1';
+            }
+          }
+        }, 800); // Delay of 800ms
+      }
+    }
+  },
 }
 </script>
 
@@ -189,189 +182,165 @@ export default {
   position: relative;
   background-color: var(--dark-bg);
   color: var(--dark-text);
-  padding: 100px 0 120px;
+  padding: 120px 0 70px;
   overflow: hidden;
 }
 
-.polygon-particles {
+.hero-background {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><polygon points="10,1 19,10 10,19 1,10" stroke="rgba(123,63,228,0.15)" stroke-width="1" fill="none" /></svg>');
-  background-size: 80px 80px;
-  opacity: 0.5;
-  animation: floatParticles 30s linear infinite;
+  width: 100%;
+  height: 100%;
+  background-image: url('@/assets/wallpaper.avif');
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
 }
 
-.hero-glow-1, .hero-glow-2 {
+.hero-overlay {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(5, 5, 10, 0.7), rgba(10, 10, 20, 0.9));
+  z-index: 2;
 }
 
-.hero-glow-1 {
-  top: -150px;
-  left: -100px;
-  width: 500px;
-  height: 500px;
-  background: rgba(123, 63, 228, 0.2);
-}
-
-.hero-glow-2 {
-  bottom: -200px;
-  right: -100px;
-  width: 600px;
-  height: 600px;
-  background: rgba(167, 38, 193, 0.15);
-}
-
-.hero-content {
+.hero-section .container {
   position: relative;
-  z-index: 10;
-  padding-top: 40px;
-}
-
-.hero-badge {
-  display: inline-block;
-  background: rgba(123, 63, 228, 0.15);
-  color: var(--primary-color);
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 6px 15px;
-  border-radius: 30px;
-  margin-bottom: 20px;
-  border: 1px solid rgba(123, 63, 228, 0.3);
+  z-index: 3;
 }
 
 .hero-title {
-  font-size: 4rem;
-  font-weight: 800;
+  font-size: 5rem;
+  font-weight: 700;
   line-height: 1.1;
   margin-bottom: 20px;
-  background: linear-gradient(90deg, #7b3fe4, #a726c1, #7b3fe4);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientFlow 5s ease infinite;
+  color: var(--dark-text);
+  letter-spacing: -0.03em;
+  z-index: 3;
+  position: relative;
 }
 
 .hero-tagline {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
-  color: var(--primary-color);
-}
-
-.hero-description {
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
+  font-size: 1.25rem;
+  margin-bottom: 2.5rem;
   color: var(--dark-text-secondary);
-  max-width: 90%;
+  font-weight: normal;
+  letter-spacing: -0.01em;
+  z-index: 3;
+  position: relative;
 }
 
-.btn-glow {
-  padding: 12px 30px;
-  font-weight: 600;
-  border-radius: 8px;
-  background: var(--primary-gradient);
+.btn-cta {
+  padding: 12px 24px;
+  font-weight: 500;
+  border-radius: 50px;
+  background: var(--primary-color);
+  color: white;
   border: none;
-  box-shadow: 0 5px 20px var(--glow-color);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  letter-spacing: -0.01em;
 }
 
-.btn-glow:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px var(--glow-color);
+.btn-cta:hover {
+  background: var(--primary-color-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  color: white;
 }
 
-.btn-outline-glow {
-  padding: 12px 30px;
-  font-weight: 600;
-  border-radius: 8px;
-  background: transparent;
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
-  transition: all 0.3s ease;
+.btn-video {
+  padding: 12px 24px;
+  font-weight: 500;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--dark-text);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s ease;
+  letter-spacing: -0.01em;
 }
 
-.btn-outline-glow:hover {
-  background: rgba(123, 63, 228, 0.1);
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(123, 63, 228, 0.2);
+.btn-video:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.editor-preview {
+  margin-top: 60px;
+  position: relative;
+}
+
+.date-badge {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 8px 16px;
+  border-radius: 30px;
+  color: var(--dark-text-secondary);
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .video-container {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  z-index: 10;
-}
-
-.glow-border {
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: var(--primary-gradient);
-  border-radius: 18px;
-  z-index: -1;
-  opacity: 0.7;
-  animation: pulseBorder 2s ease-in-out infinite;
-}
-
-/* Stats Section */
-.stats-section {
+  width: 100%;
+  height: 600px;
   background-color: var(--dark-card-bg);
-  transform: translateY(-50px);
-  z-index: 20;
-  position: relative;
-  border-radius: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--dark-border);
 }
 
-.stats-row {
-  background: linear-gradient(90deg, rgba(123, 63, 228, 0.05), rgba(167, 38, 193, 0.05));
-  border-radius: 16px;
-  padding: 30px 20px;
-  margin: 0 5px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(123, 63, 228, 0.1);
+/* Animation styles */
+.animate-in {
+  opacity: 0;
+  transform: translateY(30px);
 }
 
-.stat-card {
-  text-align: center;
-  padding: 15px;
+.fade-up {
+  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-.stat-icon {
-  font-size: 2rem;
-  color: var(--primary-color);
-  margin-bottom: 10px;
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.stat-number {
-  font-size: 2.5rem;
-  font-weight: 700;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 5px;
+.delay-1 {
+  animation-delay: 0.2s;
 }
 
-.stat-title {
-  color: var(--dark-text-secondary);
-  font-size: 1rem;
+.delay-2 {
+  animation-delay: 0.4s;
+}
+
+.delay-3 {
+  animation-delay: 0.6s;
+}
+
+.delay-4 {
+  animation-delay: 0.8s;
 }
 
 /* Features Section */
 .features-section {
   background-color: var(--dark-bg);
-  padding: 60px 0;
+  padding: 100px 0;
   position: relative;
   z-index: 10;
 }
@@ -407,114 +376,100 @@ export default {
 .feature-card {
   background-color: var(--dark-card-bg);
   border: 1px solid var(--dark-border);
-  border-radius: 12px;
-  padding: 30px;
+  border-radius: 8px;
+  padding: 24px;
   height: 100%;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, rgba(123, 63, 228, 0.05), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
 .feature-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-  border-color: rgba(123, 63, 228, 0.3);
-}
-
-.feature-card:hover::before {
-  opacity: 1;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: rgba(94, 92, 230, 0.3);
 }
 
 .feature-icon {
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(123, 63, 228, 0.1);
-  border-radius: 12px;
-  font-size: 1.5rem;
+  background: rgba(94, 92, 230, 0.1);
+  border-radius: 8px;
+  font-size: 1.25rem;
   color: var(--primary-color);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .feature-card h3 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   color: var(--dark-text);
+  letter-spacing: -0.01em;
 }
 
 .feature-card p {
   color: var(--dark-text-secondary);
   font-size: 0.95rem;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* How it works section */
 .how-it-works-section {
-  background-color: var(--dark-card-bg);
+  background-color: var(--dark-card-secondary);
   padding: 80px 0;
 }
 
 .step-card {
-  background-color: var(--dark-bg);
+  background-color: var(--dark-card-bg);
   border: 1px solid var(--dark-border);
-  border-radius: 12px;
-  padding: 30px;
+  border-radius: 8px;
+  padding: 24px;
   height: 100%;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .step-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border-color: rgba(123, 63, 228, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: rgba(94, 92, 230, 0.3);
 }
 
 .step-number {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 15px;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  opacity: 0.8;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--primary-color);
+  opacity: 0.9;
+  letter-spacing: -0.02em;
 }
 
 .step-card h3 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   color: var(--dark-text);
+  letter-spacing: -0.01em;
 }
 
 .step-card p {
   color: var(--dark-text-secondary);
   font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 /* CTA Section */
 .cta-section {
-  background-color: var(--dark-bg);
+  background-color: var(--dark-card-bg);
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 12px;
   margin: 40px 20px;
   border: 1px solid var(--dark-border);
+  padding: 50px 30px;
 }
 
 .cta-glow {
@@ -523,8 +478,9 @@ export default {
   right: -100px;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(123, 63, 228, 0.15), transparent 70%);
+  background: radial-gradient(circle, rgba(94, 92, 230, 0.12), transparent 70%);
   border-radius: 50%;
+  z-index: 0;
 }
 
 .cta-title {
@@ -532,59 +488,22 @@ export default {
   font-weight: 700;
   margin-bottom: 10px;
   color: var(--dark-text);
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
 }
 
 .cta-text {
   font-size: 1.1rem;
   color: var(--dark-text-secondary);
-}
-
-/* Animations */
-@keyframes gradientFlow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes floatParticles {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 500px 500px;
-  }
-}
-
-@keyframes pulseBorder {
-  0% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.5;
-  }
+  position: relative;
+  z-index: 1;
 }
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
   .hero-title {
-    font-size: 3rem;
-  }
-  
-  .hero-content {
-    padding-top: 0;
-  }
-  
-  .stats-section {
-    transform: translateY(-30px);
+    font-size: 3.5rem;
   }
   
   .cta-title {
@@ -594,11 +513,11 @@ export default {
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 70px 0 100px;
+    padding: 70px 0 50px;
   }
   
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
   }
   
   .section-title {

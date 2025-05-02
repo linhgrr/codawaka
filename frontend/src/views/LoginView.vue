@@ -133,7 +133,7 @@ export default {
   right: -100px;
   width: 400px;
   height: 400px;
-  background: rgba(123, 63, 228, 0.15);
+  background: rgba(94, 92, 230, 0.12);
 }
 
 .login-glow-2 {
@@ -141,22 +141,22 @@ export default {
   left: -100px;
   width: 350px;
   height: 350px;
-  background: rgba(167, 38, 193, 0.1);
+  background: rgba(5, 113, 255, 0.08);
 }
 
 .login-card {
   border: 1px solid var(--dark-border);
-  border-radius: 20px;
+  border-radius: 12px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   background-color: var(--dark-card-bg);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   overflow: hidden;
 }
 
 .login-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  border-color: rgba(123, 63, 228, 0.3);
+  border-color: rgba(94, 92, 230, 0.3);
 }
 
 .login-card::before {
@@ -174,6 +174,7 @@ export default {
   font-weight: 700;
   position: relative;
   margin-bottom: 30px;
+  letter-spacing: -0.02em;
 }
 
 .login-title:after {
@@ -199,31 +200,32 @@ export default {
   background-color: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--dark-border);
   color: var(--dark-text);
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 12px 15px;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .custom-input:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(123, 63, 228, 0.2);
+  box-shadow: 0 0 0 3px rgba(94, 92, 230, 0.2);
 }
 
 .login-btn {
-  background: var(--primary-gradient);
+  background: var(--primary-color);
   border: none;
-  font-weight: 600;
-  border-radius: 10px;
+  font-weight: 500;
+  border-radius: 6px;
   padding: 12px 0;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px var(--glow-color);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   margin-top: 10px;
 }
 
 .login-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--glow-color);
+  background: var(--primary-color-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .register-prompt {
