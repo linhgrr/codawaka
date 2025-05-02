@@ -4,7 +4,7 @@
     <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
       <div class="container">
         <router-link to="/" class="navbar-brand">
-          <span class="brand-text">Codawaka</span>
+          <span class="brand-text">CodaWaka</span>
           <span class="brand-highlight">AI</span>
         </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
