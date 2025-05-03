@@ -86,9 +86,13 @@ class GoogleApiClient:
         
         if "429" in error_message or "quota" in error_message.lower():
             logger.warning(f"Rate limit reached for API key #{key_index + 1}: {error_message}")
+            # Rotate key on rate limit
+            self.key_manager.rotate_key()
             return RateLimitError(f"Rate limit exceeded: {error_message}")
         else:
             logger.error(f"Error with Google API key #{key_index + 1}: {error_message}")
+            # Rotate key on any error
+            self.key_manager.rotate_key()
             return None
     
     def generate_content(self, model_name: str, messages: List[str]) -> Optional[str]:
@@ -181,13 +185,11 @@ class GoogleApiClient:
             
             # Process successful response
             if response and hasattr(response, 'text') and response.text:
+                if response.text:
+                    logger.info(f"Response from API key #{self.key_manager.current_key_index + 1}: {response.text.strip()[:100]}...")
                 logger.info(f"Request successful with API key #{self.key_manager.current_key_index + 1} in {elapsed_time:.1f} seconds")
-                # Add explicit log that we're returning from API
                 logger.info("Successfully received response from Google API - beginning post-processing")
                 
-                # Increment successful request count
-                self.key_manager.increment_request_count()
-                logger.info(f"Incremented request count for API key #{self.key_manager.current_key_index + 1}")
                 return response.text.strip()
             
             # No valid response text
@@ -209,11 +211,13 @@ class GoogleApiClient:
             Clean code without markdown formatting
         """
         # Simple implementation to avoid any potential issues
-        print("Using simplified clean_code_response")
+        logger.info("Using simplified clean_code_response method")
         
         if not code:
+            logger.warning("Received empty code response")
             return ""
             
         # Just return the code as is, without any processing
         # This ensures we don't get stuck in post-processing
+        logger.info(f"Returning unprocessed code with length: {len(code)}")
         return code
