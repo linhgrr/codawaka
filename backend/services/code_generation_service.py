@@ -112,7 +112,6 @@ class DirectAPICodeGenerator:
                 logger.info(f"Response received from Google client: {'Not None' if raw_response else 'None'}")
             except Exception as e:
                 logger.error(f"Exception during Google API call: {str(e)}")
-                print(f"Exception during Google API call: {str(e)}")
                 return None
             
             if raw_response:
@@ -128,21 +127,16 @@ class DirectAPICodeGenerator:
                 
                 if cleaned_code:
                     logger.info(f"Code cleaning successful, length: {len(cleaned_code)}")
-                    print(f"Code cleaning successful, length: {len(cleaned_code)}")
                 else:
                     logger.warning("Cleaned code is empty or None")
-                    print("Cleaned code is empty or None")
                 
                 logger.info("Returning cleaned code")
-                print("Returning cleaned code")
                 return cleaned_code
             
             logger.warning("No response received from Google API")
-            print("No response received from Google API")
             return None
         except Exception as e:
             logger.error(f"Error generating code with Google: {str(e)}")
-            print(f"Exception in generate_code_with_google: {str(e)}")
             return None
     
     @classmethod
