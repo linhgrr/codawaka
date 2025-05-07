@@ -67,17 +67,23 @@ class CodeGenerationRepository(BaseRepository[CodeGeneration, CodeGenerationCrea
         Returns:
             Created CodeGeneration object
         """
-        code_gen = CodeGeneration(
-            user_id=user_id,
-            model_name=model_name,
-            prompt=prompt,
-            generated_code=generated_code,
-            credits_used=credits_used,
-            timestamp=datetime.utcnow().isoformat()
-        )
-        
-        self.db.add(code_gen)
-        self.db.commit()
-        self.db.refresh(code_gen)
-        
-        return code_gen
+        try:
+            code_gen = CodeGeneration(
+                user_id=user_id,
+                model_name=model_name,
+                prompt=prompt,
+                generated_code=generated_code,
+                credits_used=credits_used,
+                timestamp=datetime.utcnow().isoformat()
+            )
+            
+            self.db.add(code_gen)
+            self.db.commit()
+            self.db.refresh(code_gen)
+            
+            return code_gen
+        except Exception as e:
+            # Rollback transaction on error
+            self.db.rollback()
+            print(f"Error creating code generation record: {str(e)}")
+            raise

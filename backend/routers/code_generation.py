@@ -45,33 +45,6 @@ def generate_code(
     return code_gen
 
 
-@router.post("/generate-code-async", response_model=CodeGeneration)
-async def generate_code_async(
-    code_request: CodeGenerationCreate,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
-):
-    """Generate code asynchronously based on a prompt using the specified model"""
-    # Get service instance using DI
-    code_gen_service = CodeGenerationService.get_instance(db)
-    
-    code_gen = await code_gen_service.process_generation_request_async(
-        user_id=current_user.id,
-        model_name=code_request.model_name,
-        prompt=code_request.prompt,
-        language=code_request.language
-    )
-    
-    if code_gen is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Code generation failed. Please check your credits and model name."
-        )
-    
-    return code_gen
-
-
 @router.post("/completion")
 def generate_code_by_username(
     code_request: CodeGenerationByUsername,
