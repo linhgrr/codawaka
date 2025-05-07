@@ -1,4 +1,5 @@
 <template>
+  <Analytics />
   <div id="app" class="dark-theme">
     <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
       <div class="container">
@@ -59,6 +60,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { Analytics } from '@vercel/analytics/vue';
 
 export default {
   name: 'App',
