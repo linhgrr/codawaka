@@ -76,9 +76,15 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
         Returns:
             True if update successful, False otherwise
         """
-        user = self.get(user_id)
-        if user:
-            user.credits += credit_change
-            self.db.commit()
-            return True
-        return False
+        try:
+            user = self.get(user_id)
+            if user:
+                user.credits += credit_change
+                self.db.commit()
+                return True
+            return False
+        except Exception as e:
+            # Rollback transaction on error
+            self.db.rollback()
+            print(f"Error updating user credits: {str(e)}")
+            raise
