@@ -101,9 +101,17 @@ class PaymentConfig:
     MIN_CREDITS = int(os.getenv("MIN_CREDITS", "10"))      # Minimum 10 credits per purchase
     
     # Frontend URLs
-    FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "https://codawaka.vercel.app/")
+    FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "https://codawaka.vercel.app")
     PAYMENT_CANCEL_URL = f"{FRONTEND_BASE_URL}/payment-result?status=cancel"
     PAYMENT_SUCCESS_URL = f"{FRONTEND_BASE_URL}/payment-result?status=success"
+
+class EmailConfig:
+    """Email (SMTP) configuration"""
+    SMTP_SERVER = os.getenv("EMAIL_SMTP_SERVER", "smtp.gmail.com")
+    SMTP_PORT = int(os.getenv("EMAIL_SMTP_PORT", "587"))
+    SMTP_USER = os.getenv("EMAIL_SMTP_USER")
+    SMTP_PASSWORD = os.getenv("EMAIL_SMTP_PASSWORD")
+    FROM_ADDRESS = os.getenv("EMAIL_FROM_ADDRESS")
 
 class Config:
     """Main configuration class that combines all config sections"""
@@ -112,6 +120,7 @@ class Config:
     CORS = CORSConfig
     AI = AIModelsConfig
     PAYMENT = PaymentConfig
+    EMAIL = EmailConfig
     
     # Application metadata
     APP_NAME = "Code Generator API"

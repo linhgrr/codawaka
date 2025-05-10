@@ -53,6 +53,16 @@ const routes = [
     name: 'paymentResult',
     component: () => import('../views/PaymentResultView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/forgot-password',
+    name: 'forgotPassword',
+    component: () => import('../views/ForgotPasswordView.vue')
+  },
+  {
+    path: '/reset-password',
+    name: 'resetPassword',
+    component: () => import('../views/ResetPasswordView.vue')
   }
 ]
 

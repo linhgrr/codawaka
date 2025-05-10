@@ -2,10 +2,11 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from fastapi import BackgroundTasks
 
 from database import get_db
 from models import User  # Đảm bảo import User từ models, không phải từ schemas
-from schemas import Token, UserCreate, User as UserSchema  # Đổi tên tránh xung đột
+from schemas import Token, UserCreate, User as UserSchema, ForgotPasswordRequest, ResetPasswordRequest  # Đổi tên tránh xung đột
 from core.security import authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from services.user_service import UserService
 
@@ -80,3 +81,15 @@ def create_admin_user(
         password=admin.password,
         is_admin=True
     )
+
+@router.post("/forgot-password")
+def forgot_password(request: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """Nhận email, tạo token và gửi email reset password"""
+    UserService.forgot_password(db, request.email, background_tasks)
+    return {"message": "Nếu email tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi."}
+
+@router.post("/reset-password")
+def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """Đặt lại mật khẩu mới bằng token"""
+    UserService.reset_password(db, request.token, request.new_password)
+    return {"message": "Đặt lại mật khẩu thành công."}

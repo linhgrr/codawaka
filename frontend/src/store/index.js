@@ -164,7 +164,7 @@ export default createStore({
     fetchModels({ commit, state }) {
       if (!state.token) return
       
-      return axios.get(`${API_URL}/models`)
+      return axios.get(`${API_URL}/models/`)
         .then(resp => {
           commit('SET_MODELS', resp.data)
           return resp
