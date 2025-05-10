@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="dark-theme">
-    <nav class="navbar navbar-expand-lg custom-navbar">
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
       <div class="container">
         <router-link to="/" class="navbar-brand">
           <span class="brand-text">Codawaka</span>
@@ -52,6 +52,7 @@
       </div>
     </nav>
 
+    <div class="navbar-spacer"></div>
     <router-view />
   </div>
 </template>
@@ -66,6 +67,14 @@ export default {
   },
   methods: {
     ...mapActions(['logout']),
+    handleScroll() {
+      const navbar = document.querySelector('.custom-navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    }
   },
   created() {
     // Load FontAwesome if not already loaded
@@ -76,22 +85,40 @@ export default {
       link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
       document.head.appendChild(link);
     }
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
   }
 };
 </script>
 
 <style>
 :root {
-  --dark-bg: #0c0c1d;
-  --dark-card-bg: #12122a;
-  --dark-navbar: #080816;
-  --dark-border: #212145;
-  --dark-text: #e0e0ff;
-  --dark-text-secondary: #9999cc;
-  --primary-color: #7b3fe4;
-  --primary-gradient: linear-gradient(90deg, #7b3fe4, #a726c1);
-  --accent-color: #a726c1;
-  --glow-color: rgba(123, 63, 228, 0.5);
+  /* Main background colors */
+  --dark-bg: #0D0D12;
+  --dark-card-bg: #101016;
+  --dark-card-secondary: #18181F;
+  --dark-navbar: #0A0A0F;
+  --dark-border: #27272F;
+  
+  /* Text colors */
+  --dark-text: #FFFFFF;
+  --dark-text-secondary: #A1A1AA;
+  
+  /* Brand colors */
+  --primary-color: #5E5CE6;
+  --primary-color-hover: #7A78FF;
+  --primary-gradient: linear-gradient(90deg, #5E5CE6, #8F8CF7);
+  --accent-color: #0571FF;
+  --glow-color: rgba(94, 92, 230, 0.4);
+  
+  /* Special colors */
+  --success-color: #0CB07A;
+  --warning-color: #FFB224;
+  --danger-color: #FF4545;
 }
 
 * {
@@ -115,10 +142,22 @@ body, html {
 }
 
 .custom-navbar {
-  background-color: var(--dark-navbar);
+  background-color: rgba(8, 8, 22, 0.7);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   padding: 15px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.navbar-spacer {
+  height: 80px; /* Adjust based on your navbar height */
+}
+
+.scrolled {
+  background-color: rgba(8, 8, 22, 0.9);
+  padding: 10px 0;
 }
 
 .navbar-brand {
@@ -156,27 +195,64 @@ body, html {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
+.btn-primary {
+  background: var(--primary-color);
+  border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: white;
+  padding: 10px 16px;
+  letter-spacing: -0.01em;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-color-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: var(--dark-text);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 10px 16px;
+  letter-spacing: -0.01em;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
 .btn-outline {
-  border: 1px solid var(--primary-color);
-  border-radius: 8px;
-  color: var(--primary-color) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: var(--dark-text) !important;
+  background: transparent;
 }
 
 .btn-outline:hover {
-  background: var(--primary-color);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
   color: white !important;
 }
 
 .credits-display {
   display: flex;
   align-items: center;
-  background: rgba(123, 63, 228, 0.1);
-  border-radius: 20px;
-  padding: 6px 15px !important;
+  background: rgba(94, 92, 230, 0.12);
+  border-radius: 6px;
+  padding: 6px 12px !important;
 }
 
 .credits-icon {
-  color: gold;
+  color: var(--primary-color);
   margin-right: 8px;
 }
 
@@ -190,16 +266,17 @@ body, html {
 }
 
 .btn-buy-credits {
-  background: rgba(123, 63, 228, 0.15);
-  color: #b69fff !important;
-  border-radius: 8px;
+  background: rgba(94, 92, 230, 0.12);
+  color: var(--primary-color) !important;
+  border-radius: 6px;
   margin-right: 10px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .btn-buy-credits:hover {
-  background: rgba(123, 63, 228, 0.25);
-  transform: translateY(-2px);
+  background: rgba(94, 92, 230, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Common Components Styling */
@@ -208,20 +285,6 @@ body, html {
   border: 1px solid var(--dark-border);
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary {
-  background: var(--primary-gradient);
-  border: none;
-  box-shadow: 0 4px 15px var(--glow-color);
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--glow-color);
 }
 
 .form-control, .form-select {
@@ -234,7 +297,7 @@ body, html {
 .form-control:focus, .form-select:focus {
   background-color: rgba(0, 0, 0, 0.3);
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(123, 63, 228, 0.2);
+  box-shadow: 0 0 0 3px rgba(94, 92, 230, 0.2);
   color: var(--dark-text);
 }
 
@@ -258,9 +321,9 @@ input::placeholder, textarea::placeholder {
 }
 
 .alert-primary {
-  background-color: rgba(123, 63, 228, 0.15);
+  background-color: rgba(94, 92, 230, 0.15);
   color: #b69fff;
-  border-color: rgba(123, 63, 228, 0.3);
+  border-color: rgba(94, 92, 230, 0.3);
 }
 
 .alert-danger {
