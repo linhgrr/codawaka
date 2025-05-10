@@ -1,54 +1,40 @@
 <template>
-  <div class="login-page">
+  <div class="forgot-password-page">
     <div class="polygon-background"></div>
-    <div class="login-glow-1"></div>
-    <div class="login-glow-2"></div>
+    <div class="forgot-glow-1"></div>
+    <div class="forgot-glow-2"></div>
     
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
-          <div class="card login-card">
+          <div class="card forgot-card">
             <div class="card-body p-4 p-md-5">
-              <h2 class="login-title text-center mb-4">Login</h2>
+              <h2 class="forgot-title text-center mb-4">Quên mật khẩu</h2>
               
+              <div v-if="message" class="alert alert-success">{{ message }}</div>
               <div v-if="error" class="alert alert-danger">{{ error }}</div>
               
-              <form @submit.prevent="onSubmit">
+              <form @submit.prevent="submitEmail">
                 <div class="form-group mb-4">
-                  <label for="username" class="form-label">Username</label>
+                  <label for="email" class="form-label">Email</label>
                   <input
-                    type="text"
+                    type="email"
                     class="form-control custom-input"
-                    id="username"
-                    v-model="username"
-                    placeholder="Enter username"
+                    id="email"
+                    v-model="email"
+                    placeholder="Nhập email của bạn"
                     required
                   >
                 </div>
                 
-                <div class="form-group mb-4">
-                  <label for="password" class="form-label">Password</label>
-                  <input
-                    type="password"
-                    class="form-control custom-input"
-                    id="password"
-                    v-model="password"
-                    placeholder="Enter password"
-                    required
-                  >
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-glow w-100 py-3 login-btn" :disabled="loading">
+                <button type="submit" class="btn btn-primary btn-glow w-100 py-3 forgot-btn" :disabled="loading || cooldownActive">
                   <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  {{ loading ? 'Logging in...' : 'Login' }}
+                  <span v-if="cooldownActive">Vui lòng đợi {{ countdown }}s...</span>
+                  <span v-else>{{ loading ? 'Đang gửi...' : 'Gửi link đặt lại mật khẩu' }}</span>
                 </button>
                 
-                <p class="text-center mt-4 register-prompt">
-                  Don't have an account?
-                  <router-link to="/register" class="register-link">Register now</router-link>
-                </p>
-                <p class="text-center mt-2">
-                  <router-link to="/forgot-password" class="register-link">Forgot password?</router-link>
+                <p class="text-center mt-4">
+                  <router-link to="/login" class="back-link">Quay lại đăng nhập</router-link>
                 </p>
               </form>
             </div>
@@ -60,47 +46,63 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { API_URL } from '@/utils/apiConfig';
 import { showError } from '@/utils/toast';
 
 export default {
-  name: 'LoginView',
+  name: 'ForgotPasswordView',
   data() {
     return {
-      username: '',
-      password: '',
-      error: null,
-      loading: false
-    }
+      email: '',
+      loading: false,
+      message: '',
+      error: '',
+      cooldownActive: false,
+      countdown: 60,
+      timerId: null
+    };
   },
   methods: {
-    onSubmit() {
-      this.loading = true
-      this.error = null
+    async submitEmail() {
+      this.loading = true;
+      this.message = '';
+      this.error = '';
       
-      const user = {
-        username: this.username,
-        password: this.password
+      try {
+        await axios.post(`${API_URL}/forgot-password`, { email: this.email });
+        this.message = 'Nếu email tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi.';
+        
+        // Start cooldown
+        this.cooldownActive = true;
+        this.countdown = 60;
+        
+        this.timerId = setInterval(() => {
+          this.countdown--;
+          if (this.countdown <= 0) {
+            clearInterval(this.timerId);
+            this.cooldownActive = false;
+          }
+        }, 1000);
+        
+      } catch (err) {
+        this.error = 'Có lỗi xảy ra. Vui lòng thử lại.';
+        showError(this.error);
+      } finally {
+        this.loading = false;
       }
-      
-      this.$store.dispatch('login', user)
-        .then(() => {
-          this.$router.push('/')
-        })
-        .catch(err => {
-          console.error(err)
-          this.error = err.response?.data?.detail || 'Login failed. Please check your username and password.'
-          showError(this.error)
-        })
-        .finally(() => {
-          this.loading = false
-        })
+    }
+  },
+  beforeUnmount() {
+    if (this.timerId) {
+      clearInterval(this.timerId);
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.login-page {
+.forgot-password-page {
   min-height: calc(100vh - 76px);
   display: flex;
   align-items: center;
@@ -121,14 +123,14 @@ export default {
   z-index: -1;
 }
 
-.login-glow-1, .login-glow-2 {
+.forgot-glow-1, .forgot-glow-2 {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
   z-index: -1;
 }
 
-.login-glow-1 {
+.forgot-glow-1 {
   top: -120px;
   right: -100px;
   width: 400px;
@@ -136,7 +138,7 @@ export default {
   background: rgba(123, 63, 228, 0.15);
 }
 
-.login-glow-2 {
+.forgot-glow-2 {
   bottom: -150px;
   left: -100px;
   width: 350px;
@@ -144,7 +146,7 @@ export default {
   background: rgba(167, 38, 193, 0.1);
 }
 
-.login-card {
+.forgot-card {
   border: 1px solid var(--dark-border);
   border-radius: 20px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
@@ -153,13 +155,13 @@ export default {
   overflow: hidden;
 }
 
-.login-card:hover {
+.forgot-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   border-color: rgba(123, 63, 228, 0.3);
 }
 
-.login-card::before {
+.forgot-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -169,14 +171,14 @@ export default {
   background: var(--primary-gradient);
 }
 
-.login-title {
+.forgot-title {
   color: var(--dark-text);
   font-weight: 700;
   position: relative;
   margin-bottom: 30px;
 }
 
-.login-title:after {
+.forgot-title:after {
   content: '';
   position: absolute;
   bottom: -12px;
@@ -210,7 +212,7 @@ export default {
   box-shadow: 0 0 0 3px rgba(123, 63, 228, 0.2);
 }
 
-.login-btn {
+.forgot-btn {
   background: var(--primary-gradient);
   border: none;
   font-weight: 600;
@@ -221,26 +223,19 @@ export default {
   margin-top: 10px;
 }
 
-.login-btn:hover:not(:disabled) {
+.forgot-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--glow-color);
 }
 
-.register-prompt {
-  color: var(--dark-text-secondary);
-  font-size: 0.95rem;
-  margin-top: 20px;
-}
-
-.register-link {
+.back-link {
   color: var(--primary-color);
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
-  margin-left: 5px;
 }
 
-.register-link:hover {
+.back-link:hover {
   text-decoration: underline;
 }
 
@@ -248,6 +243,13 @@ export default {
   background-color: rgba(220, 53, 69, 0.15);
   color: #ff8896;
   border-color: rgba(220, 53, 69, 0.3);
+  border-radius: 10px;
+}
+
+.alert-success {
+  background-color: rgba(25, 135, 84, 0.15);
+  color: #75e5a0;
+  border-color: rgba(25, 135, 84, 0.3);
   border-radius: 10px;
 }
 </style>

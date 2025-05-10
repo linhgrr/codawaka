@@ -136,3 +136,12 @@ class PaymentTransaction(BaseModel):
 
 class PaymentVerify(BaseModel):
     transaction_id: str
+
+
+# Forgot password schemas
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
