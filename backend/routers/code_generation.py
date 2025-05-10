@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -7,6 +7,9 @@ from schemas import CodeGenerationCreate, CodeGeneration, CodeGenerationByUserna
 from core.security import get_current_active_user
 from services.code_generation_service import CodeGenerationService
 from services.code_history_service import CodeHistoryService
+from repositories.user_repository import UserRepository
+from repositories.code_repository import CodeGenerationRepository
+from core.dependency_injection import DIContainer
 from typing import List
 
 router = APIRouter(
@@ -23,8 +26,37 @@ def generate_code(
     current_user: User = Depends(get_current_active_user)
 ):
     """Generate code based on a prompt using the specified model"""
-    code_gen = CodeGenerationService.process_generation_request(
-        db=db,
+    # Get service instance using DI
+    code_gen_service = CodeGenerationService.get_instance(db)
+    
+    code_gen = code_gen_service.process_generation_request(
+        user_id=current_user.id,
+        model_name=code_request.model_name,
+        prompt=code_request.prompt,
+        language=code_request.language
+    )
+    
+    if code_gen is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Code generation failed. Please check your credits and model name."
+        )
+    
+    return code_gen
+
+
+@router.post("/generate-code-async", response_model=CodeGeneration)
+async def generate_code_async(
+    code_request: CodeGenerationCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """Generate code asynchronously based on a prompt using the specified model"""
+    # Get service instance using DI
+    code_gen_service = CodeGenerationService.get_instance(db)
+    
+    code_gen = await code_gen_service.process_generation_request_async(
         user_id=current_user.id,
         model_name=code_request.model_name,
         prompt=code_request.prompt,
@@ -46,8 +78,11 @@ def generate_code_by_username(
     db: Session = Depends(get_db)
 ):
     """Generate code based on a prompt using the specified model and username for authentication"""
-    # Lấy thông tin user dựa trên username
-    user = db.query(User).filter(User.username == code_request.username).first()
+    # Initialize repositories
+    user_repository = UserRepository(db)
+    
+    # Get user by username
+    user = user_repository.get_by_username(code_request.username)
     
     if not user:
         raise HTTPException(
@@ -55,8 +90,10 @@ def generate_code_by_username(
             detail="User not found"
         )
     
-    code_gen = CodeGenerationService.process_generation_request(
-        db=db,
+    # Get service instance using DI
+    code_gen_service = CodeGenerationService.get_instance(db)
+    
+    code_gen = code_gen_service.process_generation_request(
         user_id=user.id,
         model_name=code_request.model_name,
         prompt=code_request.prompt,
@@ -80,7 +117,9 @@ def get_code_generation_history(
     current_user: User = Depends(get_current_active_user)
 ):
     """Get the code generation history for the current user with pagination"""
-    return CodeHistoryService.get_user_code_history(db, current_user.id, skip, limit)
+    # Initialize repository
+    code_repository = CodeGenerationRepository(db)
+    return code_repository.get_by_user_id(current_user.id, skip, limit)
 
 
 @router.get("/history/count", response_model=dict)
@@ -89,5 +128,7 @@ def get_code_generation_history_count(
     current_user: User = Depends(get_current_active_user)
 ):
     """Get the total count of code generation history items for the current user"""
-    count = CodeHistoryService.get_user_code_history_count(db, current_user.id)
+    # Initialize repository
+    code_repository = CodeGenerationRepository(db)
+    count = code_repository.count_by_user_id(current_user.id)
     return {"count": count}

@@ -74,6 +74,14 @@ class CodeGenerationCreate(CodeGenerationBase):
     pass
 
 
+class CodeGenerationUpdate(BaseModel):
+    model_name: Optional[str] = None
+    prompt: Optional[str] = None
+    generated_code: Optional[str] = None
+    credits_used: Optional[float] = None
+    language: Optional[str] = None
+
+
 class CodeGenerationByUsername(CodeGenerationBase):
     username: str
 
