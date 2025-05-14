@@ -55,7 +55,7 @@ class AIModelsConfig:
     GOOGLE_MODELS = ["gemini-pro", "gemini-1.5-pro", "gemini-2.0-flash"]
     
     # Default model if none specified
-    DEFAULT_MODEL = "gpt-3.5-turbo"
+    DEFAULT_MODEL = "gemini-2.0-flash"
     
     # Generation parameters
     DEFAULT_TEMPERATURE = float(os.getenv("DEFAULT_TEMPERATURE", "0.2"))
