@@ -1,18 +1,81 @@
 from datetime import datetime
 import asyncio
 from sqlalchemy.orm import Session
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import json
 import requests
 import openai
 import google.generativeai as genai
+import threading
 
 from models import User, ModelPricing, CodeGeneration
 from config import Config
 
-# Configure APIs with keys from config
+# Configure OpenAI API
 openai.api_key = Config.AI.OPENAI_API_KEY
-genai.configure(api_key=Config.AI.GOOGLE_API_KEY)
+
+# Google API key management
+class GoogleAPIKeyManager:
+    """
+    Manages Google API keys using a round-robin approach to respect rate limits.
+    """
+    _instance = None
+    _lock = threading.Lock()
+    
+    def __new__(cls):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super(GoogleAPIKeyManager, cls).__new__(cls)
+                cls._instance._initialize()
+            return cls._instance
+    
+    def _initialize(self):
+        """Initialize the key manager with keys from config"""
+        self.api_keys = Config.AI.GOOGLE_API_KEYS
+        self.current_key_index = 0
+        self.request_counts = {key: 0 for key in self.api_keys}
+        self.max_requests_per_key = Config.AI.GOOGLE_API_REQUESTS_PER_KEY
+        
+        # Configure genai with the initial key
+        if self.api_keys:
+            genai.configure(api_key=self.api_keys[0])
+        else:
+            raise ValueError("No Google API keys available. Set GOOGLE_API_KEYS in your .env file.")
+    
+    def get_current_key(self) -> str:
+        """Get the current API key"""
+        with self._lock:
+            if not self.api_keys:
+                raise ValueError("No Google API keys available")
+            return self.api_keys[self.current_key_index]
+    
+    def increment_request_count(self) -> None:
+        """Increment the request count for the current key and rotate if needed"""
+        with self._lock:
+            current_key = self.api_keys[self.current_key_index]
+            self.request_counts[current_key] += 1
+            
+            # Check if we need to rotate to the next key
+            if self.request_counts[current_key] >= self.max_requests_per_key:
+                self.rotate_key()
+    
+    def rotate_key(self) -> None:
+        """Rotate to the next API key in the list"""
+        with self._lock:
+            # Reset current key's count if we've gone through all keys
+            if all(count >= self.max_requests_per_key for count in self.request_counts.values()):
+                self.request_counts = {key: 0 for key in self.api_keys}
+            
+            # Move to next key
+            self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
+            next_key = self.api_keys[self.current_key_index]
+            
+            # Configure genai with the new key
+            genai.configure(api_key=next_key)
+            print(f"Rotated to next Google API key (key index: {self.current_key_index})")
+
+# Initialize Google API key manager
+google_key_manager = GoogleAPIKeyManager()
 
 class DirectAPICodeGenerator:
     """
@@ -82,6 +145,15 @@ class DirectAPICodeGenerator:
             # Use the mapped model name or default to gemini-pro
             actual_model = Config.AI.GOOGLE_MODEL_MAPPING.get(model_name, "gemini-pro")
             
+            # Get current API key and increment request count for round-robin
+            current_key = google_key_manager.get_current_key()
+            
+            # Configure genai with the current key (redundant, but ensures the right key is used)
+            genai.configure(api_key=current_key)
+            
+            # Log which key is being used (for debugging, remove in production)
+            print(f"Using Google API key #{google_key_manager.current_key_index + 1} for request")
+            
             # Initialize the model
             model = genai.GenerativeModel(actual_model)
             
@@ -92,6 +164,9 @@ class DirectAPICodeGenerator:
                     formatted_prompt
                 ]
             )
+            
+            # After successful generation, increment the key usage count
+            google_key_manager.increment_request_count()
             
             # Extract the text response
             if response and response.text:
@@ -110,6 +185,8 @@ class DirectAPICodeGenerator:
             return None
         except Exception as e:
             print(f"Error generating code with Google: {str(e)}")
+            # In case of error with the current key, consider rotating to the next one
+            google_key_manager.rotate_key()
             return None
     
     @classmethod
