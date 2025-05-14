@@ -34,7 +34,17 @@ class AIModelsConfig:
     """Configuration for AI models and code generation"""
     # API keys
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+    
+    # Support for multiple Google API keys (comma-separated in environment variable)
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+    GOOGLE_API_KEYS = [key.strip() for key in os.getenv("GOOGLE_API_KEYS", GOOGLE_API_KEY).split(",") if key.strip()]
+    
+    # If no keys were added via GOOGLE_API_KEYS, add the single key
+    if not GOOGLE_API_KEYS and GOOGLE_API_KEY:
+        GOOGLE_API_KEYS = [GOOGLE_API_KEY]
+    
+    # Google API request limits
+    GOOGLE_API_REQUESTS_PER_KEY = int(os.getenv("GOOGLE_API_REQUESTS_PER_KEY", "10"))
     
     # Model lists
     OPENAI_MODELS = ["gpt-3.5-turbo", "gpt-4o", "gpt-4-turbo", "claude-3-opus", "claude-3-sonnet"]
