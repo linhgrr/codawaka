@@ -33,6 +33,11 @@
                 <i class="fas fa-plus-circle"></i> Buy Credits
               </router-link>
             </li>
+            <li class="nav-item" v-if="isLoggedIn">
+              <router-link to="/profile" class="nav-link">
+                <i class="fas fa-user-circle"></i> Profile
+              </router-link>
+            </li>
             <li class="nav-item" v-if="!isLoggedIn">
               <router-link to="/login" class="nav-link">Login</router-link>
             </li>

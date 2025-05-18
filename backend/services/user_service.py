@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Request
+import random
+import string
+import ipaddress
 
 from models import User
 from core.security import get_password_hash
@@ -27,6 +30,24 @@ class UserService:
         return db.query(User).filter(User.email == email).first()
     
     @staticmethod
+    def get_user_by_referral_code(db: Session, referral_code: str) -> Optional[User]:
+        """Get a user by their referral code"""
+        return db.query(User).filter(User.referral_code == referral_code).first()
+    
+    @staticmethod
+    def generate_unique_referral_code(db: Session, length: int = 8) -> str:
+        """Generate a unique referral code"""
+        while True:
+            # Generate a random code with uppercase letters and numbers
+            chars = string.ascii_uppercase + string.digits
+            code = ''.join(random.choice(chars) for _ in range(length))
+            
+            # Check if code already exists
+            existing = db.query(User).filter(User.referral_code == code).first()
+            if not existing:
+                return code
+    
+    @staticmethod
     def get_all_users(db: Session, skip: int = 0, limit: int = 100) -> List[User]:
         """Get all users with pagination"""
         return db.query(User).offset(skip).limit(limit).all()
@@ -37,7 +58,15 @@ class UserService:
         return db.query(User).count()
     
     @staticmethod
-    def create_user(db: Session, username: str, email: str, password: str, is_admin: bool = False) -> User:
+    def get_users_by_ip(db: Session, ip: str) -> List[User]:
+        """Get all users registered with a specific IP"""
+        return db.query(User).filter(User.registration_ip == ip).all()
+    
+    @staticmethod
+    def create_user(db: Session, username: str, email: str, password: str, 
+                   referral_code: Optional[str] = None, 
+                   client_ip: Optional[str] = None,
+                   is_admin: bool = False) -> User:
         """Create a new user"""
         # Check if username already exists
         if UserService.get_user_by_username(db, username):
@@ -47,15 +76,42 @@ class UserService:
         if UserService.get_user_by_email(db, email):
             raise HTTPException(status_code=400, detail="Email already registered")
         
+        # Check for suspicious multi-account creation from same IP
+        if client_ip:
+            ip_user_count = db.query(User).filter(User.registration_ip == client_ip).count()
+            if ip_user_count >= 3:  # Limit to 3 accounts per IP address
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Maximum account limit reached for your network. Please contact support."
+                )
+        
+        # Generate unique referral code for new user
+        new_referral_code = UserService.generate_unique_referral_code(db)
+        
         # Create new user
         hashed_password = get_password_hash(password)
         db_user = User(
             username=username,
             email=email,
             hashed_password=hashed_password,
-            is_admin=is_admin
+            is_admin=is_admin,
+            referral_code=new_referral_code,
+            registration_ip=client_ip
         )
         
+        # Process referral code if provided
+        if referral_code:
+            # Look up the referring user
+            referring_user = UserService.get_user_by_referral_code(db, referral_code)
+            if referring_user:
+                # Set the referred_by field on the new user
+                db_user.referred_by = referral_code
+                
+                # Add bonus credits to referring user (but only if it appears legitimate)
+                # Check if referring user and new user have different IPs to prevent self-referrals
+                if client_ip != referring_user.registration_ip:
+                    referring_user.credits += 3  # Add 3 credits for successful referral
+                    
         db.add(db_user)
         db.commit()
         db.refresh(db_user)

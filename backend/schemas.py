@@ -11,6 +11,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    referral_code: Optional[str] = None  # Optional referral code field
 
 
 class UserLogin(BaseModel):
@@ -21,8 +22,10 @@ class UserLogin(BaseModel):
 class User(UserBase):
     id: int
     is_active: bool
-    is_admin: bool = False  # Thêm trường is_admin
+    is_admin: bool = False
     credits: float
+    referral_code: str  # User's own referral code
+    referred_by: Optional[str] = None  # Referral code of the user who referred this user
 
     class Config:
         from_attributes = True
