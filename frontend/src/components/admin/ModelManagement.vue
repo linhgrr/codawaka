@@ -100,7 +100,7 @@ export default {
   methods: {
     fetchModels() {
       this.loading = true;
-      axios.get(`${API_URL}/models`, {
+      axios.get(`${API_URL}/models/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
         .then(response => {
