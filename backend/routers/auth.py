@@ -1,5 +1,5 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -16,13 +16,18 @@ router = APIRouter(
 
 
 @router.post("/register", response_model=UserSchema)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
+def register_user(user: UserCreate, request: Request, db: Session = Depends(get_db)):
     """Register a new user"""
+    # Get client IP address for anti-fraud checks
+    client_ip = request.client.host if request.client else None
+    
     return UserService.create_user(
         db=db,
         username=user.username,
         email=user.email,
-        password=user.password
+        password=user.password,
+        referral_code=user.referral_code,
+        client_ip=client_ip
     )
 
 

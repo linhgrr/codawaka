@@ -11,7 +11,7 @@
           <div class="col-lg-6 hero-content">
             <div class="hero-badge">AI Agent</div>
             <h1 class="hero-title">Code Generator AI</h1>
-            <p class="hero-tagline">"Algorithmic applications, solved with the right tools"</p>
+            <p class="hero-tagline">"Thuật toán ứng dụng, đụng tool là xong"</p>
             <p class="hero-description">
               Intelligent coding platform leveraging the power of AI Agents to solve complex programming problems in just seconds.
             </p>
