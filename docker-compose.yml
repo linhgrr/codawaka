@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      # Database
+      - DATABASE_URL=sqlite:///./data/app.db
+      # Security
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      # CORS
+      - ALLOW_ORIGINS=${ALLOW_ORIGINS:-https://codawaka.vercel.app}
+      # AI Models
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_API_KEYS=${GOOGLE_API_KEYS}
+      - GOOGLE_API_MAX_RETRIES=${GOOGLE_API_MAX_RETRIES:-4}
+      - GOOGLE_API_RETRY_DELAY=${GOOGLE_API_RETRY_DELAY:-1}
+      - GOOGLE_API_TIMEOUT=${GOOGLE_API_TIMEOUT:-30}
+      - GOOGLE_API_RATE_LIMIT_MAX_RETRIES=${GOOGLE_API_RATE_LIMIT_MAX_RETRIES:-10}
+      - GOOGLE_API_RATE_LIMIT_DELAY=${GOOGLE_API_RATE_LIMIT_DELAY:-10}
+      - DEFAULT_TEMPERATURE=${DEFAULT_TEMPERATURE:-0.2}
+      - DEFAULT_MAX_TOKENS=${DEFAULT_MAX_TOKENS:-4000}
+      # Payment
+      - PAYOS_CLIENT_ID=${PAYOS_CLIENT_ID}
+      - PAYOS_API_KEY=${PAYOS_API_KEY}
+      - PAYOS_CHECKSUM_KEY=${PAYOS_CHECKSUM_KEY}
+      - CREDIT_PRICE=${CREDIT_PRICE:-1000}
+      - MIN_CREDITS=${MIN_CREDITS:-10}
+      - FRONTEND_BASE_URL=${FRONTEND_BASE_URL:-https://codawaka.vercel.app}
+    volumes:
+      # Lưu database bên ngoài container để dữ liệu không bị mất khi container bị xóa
+      - ./data:/app/data
+  
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    depends_on:
+      - backend
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"

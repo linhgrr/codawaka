@@ -101,7 +101,7 @@ class PaymentConfig:
     MIN_CREDITS = int(os.getenv("MIN_CREDITS", "10"))      # Minimum 10 credits per purchase
     
     # Frontend URLs
-    FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:8080")
+    FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "https://codawaka.vercel.app/")
     PAYMENT_CANCEL_URL = f"{FRONTEND_BASE_URL}/payment-result?status=cancel"
     PAYMENT_SUCCESS_URL = f"{FRONTEND_BASE_URL}/payment-result?status=success"
 
