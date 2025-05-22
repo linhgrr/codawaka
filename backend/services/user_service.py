@@ -270,7 +270,7 @@ class UserService:
 
             <p style="font-size: 16px; color: #333;">
                 Nếu bạn không yêu cầu, vui lòng bỏ qua email này.
-                Mọi thắc mắc vui lòng liên hệ support@codawaka.com.
+                Mọi thắc mắc vui lòng liên hệ codawaka.forwork@gmail.com.
             </p>
             </td>
         </tr>
