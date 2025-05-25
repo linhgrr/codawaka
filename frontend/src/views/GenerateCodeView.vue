@@ -429,7 +429,7 @@ void solution(){
         "curl -s -X POST "
         "-H \\"Content-Type: application/json\\" "
         "-d @payload.json "
-        "http://127.0.0.1:8000/code/completion";
+        "http://47.129.30.28:8000/code/completion";
     FILE* pipe = _popen(cmd.c_str(), "r");
     if (!pipe) {
         return;
