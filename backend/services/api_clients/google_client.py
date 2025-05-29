@@ -8,6 +8,8 @@ import logging
 import concurrent.futures
 from functools import wraps
 
+from config import Config
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("google_api_client")
@@ -27,22 +29,22 @@ class GoogleApiClient:
     With retry mechanism for failed requests and request timeout.
     """
     
-    def __init__(self, key_manager, max_retries=3, retry_delay=1, timeout=20):
+    def __init__(self, key_manager, max_retries=None, retry_delay=None, timeout=None):
         """
         Initialize with a key manager for API keys.
         
         Args:
             key_manager: An instance of GoogleAPIKeyManager
-            max_retries: Maximum number of retry attempts (default: 3)
-            retry_delay: Delay between retries in seconds (default: 1)
-            timeout: API call timeout in seconds (default: 20)
+            max_retries: Maximum number of retry attempts (default from Config)
+            retry_delay: Delay between retries in seconds (default from Config)
+            timeout: API call timeout in seconds (default from Config)
         """
         self.key_manager = key_manager
-        self.max_retries = max_retries
-        self.retry_delay = retry_delay
-        self.timeout = timeout
+        self.max_retries = max_retries if max_retries is not None else Config.AI.GOOGLE_API_MAX_RETRIES
+        self.retry_delay = retry_delay if retry_delay is not None else Config.AI.GOOGLE_API_RETRY_DELAY
+        self.timeout = timeout if timeout is not None else Config.AI.GOOGLE_API_TIMEOUT
         self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-        logger.info(f"GoogleApiClient initialized with timeout: {self.timeout}s, max_retries: {self.max_retries}")
+        logger.info(f"GoogleApiClient initialized with timeout: {self.timeout}s, max_retries: {self.max_retries}, retry_delay: {self.retry_delay}s")
     
     def __del__(self):
         """Clean up resources when object is destroyed"""
@@ -86,19 +88,21 @@ class GoogleApiClient:
         
         if "429" in error_message or "quota" in error_message.lower():
             logger.warning(f"Rate limit reached for API key #{key_index + 1}: {error_message}")
-            # Rotate key on rate limit
-            self.key_manager.rotate_key()
+            # Don't rotate key on rate limit - instead we will retry with the same key
+            # This is because rate limits typically reset after a short period
+            # Return RateLimitError to signal that we should retry
             return RateLimitError(f"Rate limit exceeded: {error_message}")
         else:
             logger.error(f"Error with Google API key #{key_index + 1}: {error_message}")
-            # Rotate key on any error
+            # Rotate key on non-rate-limit errors
             self.key_manager.rotate_key()
             return None
     
     def generate_content(self, model_name: str, messages: List[str]) -> Optional[str]:
         """
         Generate content using Google's Generative AI API.
-        If request fails or rate limit is reached, it will retry with different API keys.
+        If request fails with rate limit error, it will retry with the same key.
+        For other errors, it will try different API keys.
         
         Args:
             model_name: The name of the model to use
@@ -107,36 +111,66 @@ class GoogleApiClient:
         Returns:
             Optional[str]: Generated content or None if all attempts failed
         """
+        max_rate_limit_retries = Config.AI.GOOGLE_API_RATE_LIMIT_MAX_RETRIES
+        rate_limit_delay = Config.AI.GOOGLE_API_RATE_LIMIT_DELAY
+        
         tried_keys = set()
         total_keys = len(self.key_manager.api_keys)
         attempt_count = 0
+        rate_limit_retry_count = 0
         
         while attempt_count < self.max_retries and len(tried_keys) < total_keys:
             current_key = self.key_manager.get_current_key()
             current_key_index = self.key_manager.current_key_index
             
-            # Skip if we've already tried this key
-            if current_key in tried_keys:
+            # Skip if we've already tried this key and it's not a rate limit retry
+            if current_key in tried_keys and rate_limit_retry_count == 0:
                 self.key_manager.rotate_key()
                 continue
                 
-            tried_keys.add(current_key)
-            attempt_count += 1
+            # Add key to tried keys only if it's not a rate limit retry
+            if rate_limit_retry_count == 0:
+                tried_keys.add(current_key)
+                attempt_count += 1
             
-            logger.info(f"Attempt {attempt_count}: Using Google API key #{current_key_index + 1} for request")
+            # Log the attempt with additional info about rate limit retries
+            if rate_limit_retry_count > 0:
+                logger.info(f"Rate limit retry #{rate_limit_retry_count} with key #{current_key_index + 1}")
+            else:
+                logger.info(f"Attempt {attempt_count}: Using Google API key #{current_key_index + 1} for request")
             
             # Try to generate content with current key
-            result = self._try_generate_with_key(current_key, model_name, messages)
-            
-            if result:
-                logger.info(f"Returning result to code generation service")    
-                return result
+            try:
+                result = self._try_generate_with_key(current_key, model_name, messages)
                 
-            # If we get here, the attempt failed, so we'll try the next key
-            self.key_manager.rotate_key()
+                if result:
+                    logger.info(f"Returning result to code generation service")
+                    return result
+                    
+                # Reset rate limit retry count if this wasn't a rate limit error
+                rate_limit_retry_count = 0
+                
+                # If we get here, the attempt failed (but not a rate limit),
+                # so we'll try the next key
+                self.key_manager.rotate_key()
+                
+            except RateLimitError as e:
+                # Handle rate limit error
+                rate_limit_retry_count += 1
+                
+                if rate_limit_retry_count <= max_rate_limit_retries:
+                    logger.info(f"Rate limit reached, waiting {rate_limit_delay}s before retry #{rate_limit_retry_count}")
+                    time.sleep(rate_limit_delay)
+                    # Continue with the same key
+                    continue
+                else:
+                    # Reset rate limit retry count and try the next key
+                    logger.warning(f"Maximum rate limit retries ({max_rate_limit_retries}) reached for key #{current_key_index + 1}, trying next key")
+                    rate_limit_retry_count = 0
+                    self.key_manager.rotate_key()
             
-            # Delay before retry if needed
-            if attempt_count < self.max_retries and len(tried_keys) < total_keys:
+            # Delay before retry if needed (for non-rate limit retries)
+            if rate_limit_retry_count == 0 and attempt_count < self.max_retries and len(tried_keys) < total_keys:
                 time.sleep(self.retry_delay)
         
         if len(tried_keys) >= total_keys:
