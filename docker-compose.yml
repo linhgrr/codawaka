@@ -33,6 +33,12 @@ services:
       - CREDIT_PRICE=${CREDIT_PRICE:-1000}
       - MIN_CREDITS=${MIN_CREDITS:-10}
       - FRONTEND_BASE_URL=${FRONTEND_BASE_URL:-https://codawaka.vercel.app}
+      # Email Configuration
+      - EMAIL_SMTP_SERVER=${EMAIL_SMTP_SERVER:-smtp.gmail.com}
+      - EMAIL_SMTP_PORT=${EMAIL_SMTP_PORT:-587}
+      - EMAIL_SMTP_USER=${EMAIL_SMTP_USER}
+      - EMAIL_SMTP_PASSWORD=${EMAIL_SMTP_PASSWORD}
+      - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS}
     volumes:
       # Lưu database bên ngoài container để dữ liệu không bị mất khi container bị xóa
       - ./data:/app/data
