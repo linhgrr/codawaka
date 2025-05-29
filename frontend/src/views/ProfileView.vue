@@ -204,7 +204,7 @@ export default {
       this.loading = true;
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
-      const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:8000';
+      const API_URL = process.env.VUE_APP_API_URL || 'http://47.129.30.28:8000';
       
       // Sử dụng Promise.all để gọi đồng thời hai API endpoints
       Promise.all([

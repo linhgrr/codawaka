@@ -2,6 +2,7 @@ import aiohttp
 import asyncio
 import time
 import random
+from tqdm import tqdm  # <- Import thư viện tqdm để tạo progress bar
 
 # Cấu hình
 BASE_URL = "http://localhost:8000"  # Thay đổi URL nếu cần
@@ -24,8 +25,14 @@ SAMPLE_PROMPTS = [
     "Tạo chương trình quản lý thư viện",
 ]
 
+# Biến đếm toàn cục
+successful_requests = 0
+failed_requests = 0
+
 # Hàm gửi một request
-async def send_code_request(session, index):
+async def send_code_request(session, index, pbar, lock):
+    global successful_requests, failed_requests
+
     prompt = random.choice(SAMPLE_PROMPTS)
     language = random.choice(["Python", "C++", "JavaScript", "Java"])
     
@@ -41,63 +48,60 @@ async def send_code_request(session, index):
         async with session.post(f"{BASE_URL}/code/completion", json=data) as response:
             elapsed = time.time() - start_time
             status = response.status
-            
-            if status == 200:
-                # Get the response as text since API returns the code directly as string
-                code = await response.text()
-                code_length = len(code) if code else 0
-                print(f"Request {index+1}: Success ({status}) - {elapsed:.2f}s - Code length: {code_length} chars")
-                return True, elapsed
-            else:
-                error_text = await response.text()
-                print(f"Request {index+1}: Failed ({status}) - {elapsed:.2f}s - Error: {error_text[:100]}")
-                return False, elapsed
-    except Exception as e:
+
+            async with lock:
+                if status == 200:
+                    successful_requests += 1
+                else:
+                    failed_requests += 1
+                update_progress(pbar)
+            return (status == 200), elapsed
+    except Exception:
         elapsed = time.time() - start_time
-        print(f"Request {index+1}: Exception - {elapsed:.2f}s - {str(e)}")
+        async with lock:
+            failed_requests += 1
+            update_progress(pbar)
         return False, elapsed
+
+# Hàm cập nhật progress bar
+def update_progress(pbar):
+    total_done = successful_requests + failed_requests
+    success_rate = (successful_requests / total_done) * 100 if total_done else 0
+    pbar.update(1)
+    pbar.set_description(f"Đã hoàn thành: {total_done}/{TOTAL_REQUESTS} | Thành công: {success_rate:.2f}%")
 
 # Hàm chính chạy stress test
 async def run_stress_test():
-    successful_requests = 0
-    failed_requests = 0
+    global successful_requests, failed_requests
+
     total_time = 0
     response_times = []
-    
+
     start_time = time.time()
-    
-    # Tạo phiên và giới hạn số lượng kết nối
+    lock = asyncio.Lock()
     connector = aiohttp.TCPConnector(limit=MAX_CONCURRENT)
+
     async with aiohttp.ClientSession(connector=connector) as session:
-        tasks = []
-        for i in range(TOTAL_REQUESTS):
-            # Tạo một task mới cho mỗi request
-            task = asyncio.create_task(send_code_request(session, i))
-            tasks.append(task)
-            
-            # Thêm độ trễ nhỏ giữa các lần tạo task để tránh quá tải
-            await asyncio.sleep(0.05)
-        
-        # Chờ tất cả các task hoàn thành
-        results = await asyncio.gather(*tasks)
-        
-        for success, elapsed in results:
-            if success:
-                successful_requests += 1
-            else:
-                failed_requests += 1
-            
-            response_times.append(elapsed)
-            total_time += elapsed
-    
+        with tqdm(total=TOTAL_REQUESTS, ncols=100) as pbar:
+            tasks = []
+            for i in range(TOTAL_REQUESTS):
+                task = asyncio.create_task(send_code_request(session, i, pbar, lock))
+                tasks.append(task)
+                await asyncio.sleep(0.05)
+
+            results = await asyncio.gather(*tasks)
+
+            for success, elapsed in results:
+                response_times.append(elapsed)
+                total_time += elapsed
+
     end_time = time.time()
     test_duration = end_time - start_time
-    
-    # Tính toán và hiển thị kết quả
+
     avg_response_time = total_time / len(response_times) if response_times else 0
     max_response_time = max(response_times) if response_times else 0
     min_response_time = min(response_times) if response_times else 0
-    
+
     print("\n--- Kết quả Stress Test ---")
     print(f"Tổng số request: {TOTAL_REQUESTS}")
     print(f"Request thành công: {successful_requests}")

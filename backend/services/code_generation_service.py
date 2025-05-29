@@ -26,10 +26,7 @@ DIContainer.register_instance(GoogleAPIKeyManager, google_key_manager)
 # Get API clients through DI container
 google_client = DIContainer.get_instance(
     GoogleApiClient, 
-    google_key_manager, 
-    max_retries=3, 
-    retry_delay=1,
-    timeout=20
+    google_key_manager
 )
 openai_client = DIContainer.get_instance(OpenAIApiClient, Config.AI.OPENAI_API_KEY)
 

@@ -43,6 +43,13 @@ class AIModelsConfig:
     if not GOOGLE_API_KEYS and GOOGLE_API_KEY:
         GOOGLE_API_KEYS = [GOOGLE_API_KEY]
     
+    # Google API client configuration
+    GOOGLE_API_MAX_RETRIES = int(os.getenv("GOOGLE_API_MAX_RETRIES", "4"))
+    GOOGLE_API_RETRY_DELAY = int(os.getenv("GOOGLE_API_RETRY_DELAY", "1"))
+    GOOGLE_API_TIMEOUT = int(os.getenv("GOOGLE_API_TIMEOUT", "30"))
+    GOOGLE_API_RATE_LIMIT_MAX_RETRIES = int(os.getenv("GOOGLE_API_RATE_LIMIT_MAX_RETRIES", "10"))
+    GOOGLE_API_RATE_LIMIT_DELAY = int(os.getenv("GOOGLE_API_RATE_LIMIT_DELAY", "10"))
+    
     # Model lists
     OPENAI_MODELS = ["gpt-3.5-turbo", "gpt-4o", "gpt-4-turbo", "claude-3-opus", "claude-3-sonnet"]
     GOOGLE_MODELS = ["gemini-pro", "gemini-1.5-pro", "gemini-2.0-flash"]
